@@ -1,0 +1,13 @@
+library(dplyr)
+fileName = "household_power_consumption.txt"
+row1 <- read.csv2(fileName, header=TRUE, nrow=1)
+numCol <- ncol(row1)
+col1 <- read.csv2(fileName,header=TRUE,as.is = TRUE,colClasses = c(NA,rep("NULL",nc-1)))
+startPoint <- which.max(as.Date(col1$Date,"%d/%m/%Y") >= "2007-02-01")
+setAs("character","myDate", function(from) as.Date(from,format="%d/%m/%Y"))
+testData <- read.csv2(fileName,dec=".",col.names=names(row1),skip=startPoint, header=TRUE, na.strings="?",nrows=10000,colClasses=c("myDate",rep("character",nc-1)))
+filteredData <- subset(testData, Date <= "2007-02-02")
+filteredData$dateTime <- with(filteredData, as.POSIXct(paste(Date,Time),format="%Y-%m-%d %H:%M"))
+plot(Global_active_power ~ dateTime, data=filteredData,type="l",xlab="",ylab="Global Active Power (kilowatts)")
+dev.print(file="plot2.png",device=png,width=480,height=480)
+dev.off()
